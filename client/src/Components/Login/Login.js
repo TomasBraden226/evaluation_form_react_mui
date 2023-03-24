@@ -3,6 +3,9 @@ import basestyle from "../Base.module.css";
 import loginstyle from "./Login.module.css";
 import axios from "axios";
 import { useNavigate, NavLink } from "react-router-dom";
+
+
+
 const Login = ({ setUserState }) => {
   const navigate = useNavigate();
   const [formErrors, setFormErrors] = useState({});
@@ -46,6 +49,9 @@ const Login = ({ setUserState }) => {
 
       axios.post("/api/auth/signin", {username: user.lname, password: user.password}).then((res) => {
         // alert(res.data.message);
+        
+        localStorage.setItem('user_info', JSON.stringify(res.data.user));
+        
         setUserState(res.data.user);
         navigate("/", { replace: true });
       });

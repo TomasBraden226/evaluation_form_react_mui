@@ -11,27 +11,27 @@ module.exports = function (app) {
   //Get all users data
   app.get(
     "/api/sub_deps",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken],
     controller.allSubDeps
   );
 
   //Create user
   app.post(
     "/api/sub_dep/create",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken],
     controller.createSubDep
   );
 
   //Create user
   app.post(
     "/api/sub_dep/update",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken],
     controller.updateSubDep
   );
 
   app.delete(
     "/api/sub_dep/delete",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken],
     controller.deleteSubDep
   );
 };

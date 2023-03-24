@@ -11,14 +11,14 @@ module.exports = function (app) {
   //Get all users data
   app.get(
     "/api/users",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken],
     controller.allUsers
   );
 
   //Create user
   app.post(
     "/api/user/create",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken],
     [
       verifySignUp.checkDuplicateUsernameOrEmail,
       verifySignUp.checkRolesExisted,
@@ -29,13 +29,13 @@ module.exports = function (app) {
   //Create user
   app.post(
     "/api/user/update",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken],
     controller.updateUser
   );
 
   app.delete(
     "/api/user/delete",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken],
     controller.deleteUser
   );
 };

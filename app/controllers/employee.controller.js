@@ -7,7 +7,7 @@ const SubDepartment = db.subDep;
 
 exports.allEmployees = (req, res) => {
   Employee.find()
-    .populate('sub_dep_id')
+    .populate("sub_dep_id")
     .sort({ createdAt: -1 }) //it will find all data and show it in descending order
     .then((result) => {
       res.status(200).json(result);
