@@ -4,7 +4,15 @@ import loginstyle from "./Login.module.css";
 import axios from "axios";
 import { useNavigate, NavLink } from "react-router-dom";
 
+import {
+  Button,
+} from "@mui/material";
 
+const styles = {
+  primaryBackgroundColor: {
+    backgroundColor: 'rgb(103, 58, 183)', 
+  },
+}
 
 const Login = ({ setUserState }) => {
   const navigate = useNavigate();
@@ -79,9 +87,17 @@ const Login = ({ setUserState }) => {
           value={user.password}
         />
         <p className={basestyle.error}>{formErrors.password}</p>
-        <button className={basestyle.button_common} onClick={loginHandler}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={ loginHandler }
+          className={basestyle.button_common}
+          style={{...styles.primaryBackgroundColor, margin: '20px auto', width: '40%', marginLeft: '0px', borderRadius: '20px'}}>
+            Login
+        </Button>
+        {/* <button className={basestyle.button_common} onClick={loginHandler}>
           Login
-        </button>
+        </button> */}
       </form>
       <NavLink to="/signup">Not yet registered? Register Now</NavLink>
     </div>

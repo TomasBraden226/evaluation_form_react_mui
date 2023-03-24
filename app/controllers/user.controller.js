@@ -112,3 +112,29 @@ exports.deleteUser = (req, res) => {
       res.status(500).send({ message: err });
     })
 };
+
+exports.updateCriteria = (req, res) => {
+
+  console.log(req.body);
+  User.findById(req.body.userId).exec((err, user) => {
+    if (err) {
+      res.status(500).send({ message: err });
+      return;
+    }
+    if (user) {
+      const newUser = { 
+        criteria: req.body.criteria
+      };
+      User.findByIdAndUpdate(req.body.userId, newUser, { new: true })
+      .then((updatedUser) => {
+        console.log(updatedUser);
+        res.status(200).json(updatedUser);
+      })
+      .catch(error => {
+        res.status(500).send({ message: error });
+      })
+    } else {
+      res.status(400).json({ message: "Failed! There is no user like this!" });
+    }
+  });
+};

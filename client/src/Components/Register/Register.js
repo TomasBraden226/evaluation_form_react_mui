@@ -6,6 +6,16 @@ import axios from "axios";
 
 import { useNavigate, NavLink } from "react-router-dom";
 
+import {
+  Button,
+} from "@mui/material";
+
+const styles = {
+  primaryBackgroundColor: {
+    backgroundColor: 'rgb(103, 58, 183)', 
+  },
+}
+
 const API_URL = "http://localhost:8080/api";
 
 const Register = () => {
@@ -125,9 +135,14 @@ const Register = () => {
             value={user.cpassword}
           />
           <p className={basestyle.error}>{formErrors.cpassword}</p>
-          <button className={basestyle.button_common} onClick={signupHandler}>
-            Register
-          </button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={ signupHandler }
+            className={basestyle.button_common}
+            style={{...styles.primaryBackgroundColor, margin: '20px auto', width: '40%', marginLeft: '0px', borderRadius: '20px'}}>
+              Register
+          </Button>
         </form>
         <NavLink to="/login">Already registered? Login</NavLink>
       </div>

@@ -38,4 +38,10 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.deleteUser
   );
+
+  app.post(
+    "/api/user/updateCriteria",
+    [authJwt.verifyToken],
+    controller.updateCriteria
+  )
 };

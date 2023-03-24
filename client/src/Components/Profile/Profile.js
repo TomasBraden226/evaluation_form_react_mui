@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import basestyle from "../Base.module.css";
+import { useNavigate, NavLink } from "react-router-dom";
 
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // import { solid, regular, brands, icon } from '@fortawesome/fontawesome-svg-core/import.macro' 
@@ -100,6 +101,8 @@ function CriteriaElement() {
 
 const Profile = ({ setUserState, username }) => {
 
+  const navigate = useNavigate();
+
   const u_name = JSON.parse(localStorage.getItem('user_info')).username;
   const pageTitle = "Evaluation form";
 
@@ -142,20 +145,24 @@ const Profile = ({ setUserState, username }) => {
   };
 
   const handleFinish = () => {
-    alert(JSON.stringify(formData));
-
-    // axios.post("/api/user/update", 
-    //   { 
-    //     userId: user.lname, 
-        
-    //   }).then((res) => {
-    //   // alert(res.data.message);
-      
-    //   localStorage.setItem('user_info', JSON.stringify(res.data.user));
-      
-    //   setUserState(res.data.user);
-    //   navigate("/", { replace: true });
-    // });
+    axios.post("/api/user/updateCriteria", 
+      { 
+        userId: formData.chefName, 
+        criteria: JSON.stringify(formData.criteria),
+      }).then((res) => {
+        console.log(res);
+        setFormData({
+          evaManager: '',
+          mainDepart: '',
+          subDepart: '',
+          chefName: '',
+          criteriaTitle: '',
+          criteriaGrade: '',
+          criteria: [],
+        });
+        setActiveStep(0);
+        navigate("/", { replace: true });
+    });
   };
 
   const handleInputChange = (event) => {
@@ -187,40 +194,34 @@ const Profile = ({ setUserState, username }) => {
   // Add Criteria to Form
   function addCriteria() {
 
+    const newCriterias = [...formData.criteria];
+
     const new_criteria = {
       rec_num: criteriaID,
       title: formData.criteriaTitle,
       emp_id: formData.chefName,
       grade: 0,
     }
+    newCriterias.push(new_criteria);
 
-    const { criteria } = formData;
-    criteria.push(new_criteria);
-
-    setFormData({ ...formData, ['criteria']: criteria });
-    
-    
+    // setFormData([ ...formData.criteria, newCriterias ]);
+    setFormData({ ...formData, criteria: newCriterias });
   }
 
   function handleCriteriaChange(idx, grade) {
-    const criteria = formData.criteria;
-    criteria[idx].grade = grade;
+    const newCriterias = [...formData.criteria];
+    newCriterias[idx].grade = grade;
+    setFormData({ ...formData, criteria: newCriterias });
   }
 
   function deleteCriteria(idx) {
-    const criteria = formData.criteria;
-    // const removedCriteria = criteria.splice(idx, 1);
-    // console.log(removedCriteria);
+    
+    const newCriterias = [...formData.criteria];
+    newCriterias.splice(idx, 1);
+    setFormData({ ...formData, criteria: newCriterias });
+
   }
 
-  if (delCriteriaID >= 0) {
-    const criteria = formData.criteria;
-    const removedCriteria = [] + criteria;
-
-    removedCriteria.splice(delCriteriaID, 1);
-    console.log(removedCriteria);
-    setDelCriteriaID(-1);
-  }
   useEffect(() => {
     getAllMainDeps();
     getAllSubDeps();
@@ -238,10 +239,6 @@ const Profile = ({ setUserState, username }) => {
       criteriaGrade: criteriaGrade.toString().trim() === '' ? 'criteriaGrade is required' : '',
     });
   }, [formData]);
-
-  useEffect(() => {
-
-  }, [criteriaID])
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -360,7 +357,7 @@ const Profile = ({ setUserState, username }) => {
                       <span>+</span>
                     </IconButton>
                   </Box>
-                  <Box style={{...styles.formHeaderTopCardWithBaner, ...styles.marBtm20}}>
+                  <Box style={{...styles.formHeaderTopCardWithBaner, ...styles.marBtm20, padding: '20px 10px'}}>
                     {
                       formData.criteria && formData.criteria.map((criteria, idx) => (
                         <Box key={idx} style={{display: 'flex', padding: '10px 15px'}}>
@@ -369,7 +366,7 @@ const Profile = ({ setUserState, username }) => {
                             <div style={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
                               <FormLabel style={{margin: 'auto', marginLeft: '0px'}} id="demo-form-control-label-placement">{criteria.title} *</FormLabel>
                               <IconButton  style={{margin: '-5px -60px auto auto'}} aria-label="delete" size="small">
-                                <DeleteIcon onClick={ setDelCriteriaID(idx) } fontSize="inherit" />
+                                <DeleteIcon onClick={ e => deleteCriteria(idx) } fontSize="inherit" />
                               </IconButton>
                             </div>
                             <RadioGroup
