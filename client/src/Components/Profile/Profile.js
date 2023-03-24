@@ -103,6 +103,9 @@ const Profile = ({ setUserState, username }) => {
   const u_name = JSON.parse(localStorage.getItem('user_info')).username;
   const pageTitle = "Evaluation form";
 
+  const [criteriaID, setCriteriaID] = useState(0);
+  const [delCriteriaID, setDelCriteriaID] = useState(-1);
+
   const [mainDeps, setMainDeps] = useState([]);
   const [subDeps, setSubDeps] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -114,11 +117,9 @@ const Profile = ({ setUserState, username }) => {
     mainDepart: '',
     subDepart: '',
     chefName: '',
-    criteria: [{
-      title: '',
-      emp_id: '',
-      grade: ''
-    }],
+    criteriaTitle: '',
+    criteriaGrade: '',
+    criteria: [],
   });
 
   const [errors, setErrors] = useState({
@@ -126,6 +127,8 @@ const Profile = ({ setUserState, username }) => {
     mainDepart: '',
     subDepart: '',
     chefName: '',
+    criteriaTitle: '',
+    criteriaGrade: '',
     criteria: [],
   });
   const [activeStep, setActiveStep] = useState(0);
@@ -159,53 +162,86 @@ const Profile = ({ setUserState, username }) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
 
-  const handleCheckboxChange  = (event) => {
-    setFormData({ ...formData, [event.target.name]: event.target.checked });
-  };
 
+  // Get All Main Department data from Backend
   function getAllMainDeps() {
     axios.get("/api/main_deps").then((res) => {
       setMainDeps(res.data);
     });
   }
   
+  // Get All Sub Department data from Backend
   function getAllSubDeps() {
     axios.get("/api/sub_deps").then((res) => {
       setSubDeps(res.data);
     });
   }
 
+  // Get All Employee data from Backend
   function getAllEmployees() {
     axios.get("/api/employees").then((res) => {
       setEmployees(res.data);
     });
   }
 
+  // Add Criteria to Form
   function addCriteria() {
-    console.log("LLLL");
-  }
-  function deleteCriteria() {
-    console.log("LLLL");
+
+    const new_criteria = {
+      rec_num: criteriaID,
+      title: formData.criteriaTitle,
+      emp_id: formData.chefName,
+      grade: 0,
+    }
+
+    const { criteria } = formData;
+    criteria.push(new_criteria);
+
+    setFormData({ ...formData, ['criteria']: criteria });
+    
+    
   }
 
+  function handleCriteriaChange(idx, grade) {
+    const criteria = formData.criteria;
+    criteria[idx].grade = grade;
+  }
+
+  function deleteCriteria(idx) {
+    const criteria = formData.criteria;
+    // const removedCriteria = criteria.splice(idx, 1);
+    // console.log(removedCriteria);
+  }
+
+  if (delCriteriaID >= 0) {
+    const criteria = formData.criteria;
+    const removedCriteria = [] + criteria;
+
+    removedCriteria.splice(delCriteriaID, 1);
+    console.log(removedCriteria);
+    setDelCriteriaID(-1);
+  }
   useEffect(() => {
     getAllMainDeps();
     getAllSubDeps();
     getAllEmployees();
-  });
+  }, [mainDeps, subDeps, employees]);
 
   useEffect(() => {
-    const { evaManager, mainDepart, subDepart, chefName, criteria } = formData;
+    const { evaManager, mainDepart, subDepart, chefName, criteria, criteriaTitle, criteriaGrade } = formData;
     setErrors({
       evaManager: evaManager.toString().trim() === '' ? 'First name is required' : '',
       mainDepart: mainDepart.toString().trim() === '' ? 'Restaurant name is required' : '',
       subDepart: subDepart.toString().trim() === '' ? 'Room name is required' : '',
       chefName: chefName.toString().trim() === '' ? 'name is required' : '',
-      criteria: criteria.toString().trim() === '' ? 'criteria is required' : '',
+      criteriaTitle: criteriaTitle.toString().trim() === '' ? 'criteriaTitle is required' : '',
+      criteriaGrade: criteriaGrade.toString().trim() === '' ? 'criteriaGrade is required' : '',
     });
   }, [formData]);
 
+  useEffect(() => {
 
+  }, [criteriaID])
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -214,6 +250,8 @@ const Profile = ({ setUserState, username }) => {
   const handleClose = () => {
     setOpen(false);
   };
+
+
 
   return (
     <div sx={{ mt: 10, width: '100%', maxWidth: '800px' }}>
@@ -233,7 +271,6 @@ const Profile = ({ setUserState, username }) => {
           <Grid item style={{width: '100%'}}>
             {activeStep === 0 && (
               <Box style={styles.marTop20}>
-                <Typography variant="h6">Step 1</Typography>
                 <Box style={{ ...styles.formCard, ...styles.marBtm20 }}>
                   <Typography marginBottom='20px'>Evaluation manager</Typography>
                   <FormControl sx={{width: '50%'}}>
@@ -315,7 +352,7 @@ const Profile = ({ setUserState, username }) => {
                     </Select>
                   </FormControl>
                 </Box>
-                <Box  >
+                <Box>
                   <Icon baseClassName="fas" className="fa-plus-circle" />
                   <Box style={{...styles.formHeaderBar, padding: '10px 15px', display: 'flex', justifyContent: 'space-between'}}>
                     <FormLabel style={{margin: 'auto', color: '#fff', marginLeft: '0px'}} id="demo-form-control-label-placement">Criterias</FormLabel>
@@ -325,22 +362,23 @@ const Profile = ({ setUserState, username }) => {
                   </Box>
                   <Box style={{...styles.formHeaderTopCardWithBaner, ...styles.marBtm20}}>
                     {
-                      formData.criteria && formData.criteria.map((criteria) => (
-                        <Box style={{display: 'flex', padding: '10px 15px'}}>
+                      formData.criteria && formData.criteria.map((criteria, idx) => (
+                        <Box key={idx} style={{display: 'flex', padding: '10px 15px'}}>
                           <FormLabel id="demo-form-control-label-placement" style={{margin: 'auto 5px'}}>Bad</FormLabel>
                           <FormControl>
                             <div style={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
-                              <FormLabel style={{margin: 'auto', marginLeft: '0px'}} id="demo-form-control-label-placement">First Criteria *</FormLabel>
+                              <FormLabel style={{margin: 'auto', marginLeft: '0px'}} id="demo-form-control-label-placement">{criteria.title} *</FormLabel>
                               <IconButton  style={{margin: '-5px -60px auto auto'}} aria-label="delete" size="small">
-                                <DeleteIcon onClick={ deleteCriteria } fontSize="inherit" />
+                                <DeleteIcon onClick={ setDelCriteriaID(idx) } fontSize="inherit" />
                               </IconButton>
                             </div>
                             <RadioGroup
                               row
                               aria-labelledby="demo-form-control-label-placement"
-                              name="criteria"
-                              value={formData.criteria}
-                              onChange={handleInputChange}
+                              name="criteriaGrade"
+                              id={idx}
+                              value={criteria.grade}
+                              onChange={e => handleCriteriaChange(idx, e.target.value)}
                               defaultValue="0"
                               sx={{display: 'flex'}}
                             >
@@ -363,10 +401,14 @@ const Profile = ({ setUserState, username }) => {
                       autoFocus
                       margin="dense"
                       id="criteria_title"
-                      label="Criteria name"
+                      label="Criteria Title"
                       type="criteria_title"
+                      value={formData.criteriaTitle}
+                      name="criteriaTitle"
+                      onChange={handleInputChange}
                       fullWidth
                       variant="standard"
+                      error={errors.criteriaTitle !== ''}
                     />
                   </DialogContent>
                   <DialogActions>
@@ -425,25 +467,6 @@ const Profile = ({ setUserState, username }) => {
                 </Button>
               </>
             )}
-            {/* <Button
-              variant="contained"
-              color="primary"
-              onClick={activeStep === steps.length - 1 ? handleFinish : handleNext}
-              
-              // disabled={activeStep === steps.length - 1}
-            >
-              {activeStep === steps.length - 1 ? "Submit" : "Next"}
-            </Button>
-            {activeStep > 0 && (
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleBack}
-                sx={{ marginLeft: 8 }}
-              >
-                Back
-              </Button>
-            )} */}
           </Grid>
         </Grid>
       </div>
