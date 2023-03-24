@@ -42,10 +42,10 @@ const Login = ({ setUserState }) => {
 
   useEffect(() => {
     if (Object.keys(formErrors).length === 0 && isSubmit) {
-      console.log(user);
+      
 
       axios.post("/api/auth/signin", {username: user.lname, password: user.password}).then((res) => {
-        alert(res.data.message);
+        // alert(res.data.message);
         setUserState(res.data.user);
         navigate("/", { replace: true });
       });

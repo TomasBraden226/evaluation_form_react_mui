@@ -103,10 +103,12 @@ exports.signin = (req, res) => {
       req.session.token = token;
 
       res.status(200).send({
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        roles: authorities,
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          roles: authorities,
+        }
       });
     });
 };
